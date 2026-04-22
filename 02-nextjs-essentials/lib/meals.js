@@ -22,7 +22,16 @@ export function getMeal(slug) {
 }
 
 export async function saveMeal(meal) {
-    meal.slug = slugify(meal.title, { lower: ture });
+    const baseSlug = slugify(meal.title, { lower: true });
+    let slug = baseSlug;
+    let suffix = 2;
+
+    while (db.prepare('SELECT 1 FROM meals WHERE slug = ?').get(slug)) {
+        slug = `${baseSlug}-${suffix}`;
+        suffix += 1;
+    }
+
+    meal.slug = slug;
     meal.instructions = xss(meal.instructions);
 
     // we do not save files in databases
@@ -46,16 +55,7 @@ export async function saveMeal(meal) {
             @image, 
             @slug, 
             @creator, 
-            @creator_emai
+            @creator_email
         )
-        `).run(mail);
-}
-
-const meal = {
-    title: formData.get("title"),
-    summary: formData.get("summary"),
-    instructions: formData.get("instructions"),
-    image: formData.get("image"),
-    creator: formData.get("name"),
-    creator_email: formData.get("email")
+        `).run(meal);
 }

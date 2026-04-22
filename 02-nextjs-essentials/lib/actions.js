@@ -1,6 +1,6 @@
 'use server';
 
-import { redirect } from "next/dist/server/api-utils";
+import { redirect } from "next/navigation";
 import { saveMeal } from "./meals";
 import { revalidatePath } from "next/cache";
 
@@ -26,12 +26,20 @@ export async function ShareMeal(prevState, formData) {
         isInvalidText(meal.summary) ||
         isInvalidText(meal.instructions) ||
         isInvalidText(meal.creator) ||
-        meal.creator_email.includes('@') ||
+        !meal.creator_email.includes('@') ||
         !meal.image || meal.image.size === 0
     )
         return { success: false, message: 'Invalid inputs' };
 
-    await saveMeal(meal);
-    revalidatePath('/meals')
+    try {
+        await saveMeal(meal);
+    } catch (error) {
+        return {
+            success: false,
+            message: error?.message || 'Saving meal failed.'
+        };
+    }
+
+    revalidatePath('/meals');
     redirect('/meals');
 }

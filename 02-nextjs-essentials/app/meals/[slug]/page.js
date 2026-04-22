@@ -3,13 +3,19 @@ import classes from './page.module.css'
 import Image from 'next/image'
 import { notFound } from 'next/navigation';
 
-export async function generateMetadata(params) {
-    const mealSlug = params.slug;
-    const meal = getMeal(mealSlug);
+export async function generateMetadata({params}) {
+    const mealSlug = params?.slug;
+    const meal = mealSlug ? getMeal(mealSlug) : null;
 
+    if (!meal) {
+        return {
+            title: 'Meal not found',
+            description: 'The requested meal could not be found.'
+        };
+    }
     return {
         title: meal.title,
-        description: meal.description
+        description: meal.summary
     }
 
 }
@@ -31,7 +37,7 @@ export default function MealsDetailPage({ params }) {
                 <div className={classes.headerText}>
                     <h1>{meal.title}</h1>
                     <p>
-                        by <a href={`mailto:${meal.creator_email}`}> {meal.creator}</a>
+                        by <a href={`mailto:${meal.creator_email}`} style={{color: 'white'}}> {meal.creator}</a>
                     </p>
                     <p className={classes.summary}>{meal.summary}</p>
                 </div>
@@ -39,7 +45,7 @@ export default function MealsDetailPage({ params }) {
             <main>
                 <p className={classes.instructions}
                     dangerouslySetInnerHTML={{
-                        _html: meal.instructions
+                        __html: meal.instructions
                     }}
                 ></p>
             </main>

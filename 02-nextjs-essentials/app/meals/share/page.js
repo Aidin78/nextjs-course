@@ -20,9 +20,9 @@ export default function ShareMealPage() {
             </header>
             <main className={classes.main}>
                 <form className={classes.form} action={formAction}>
-                    <div>
-                        {state.success != success && <div>{state.message}</div>}
-                    </div>
+                    <p className={classes.highlight} style={{ fontSize: '1.2em' }}>
+                        {state.success != "success" && state.message}
+                    </p>
                     <div className={classes.row}>
                         <p>
                             <label htmlFor="name">Your name</label>
